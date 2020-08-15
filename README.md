@@ -18,13 +18,13 @@ A repository for [HoshinoBot](https://github.com/Ice-Cirno/HoshinoBot) based [PC
 - **[会战名次查询插件](https://github.com/GWYOG/HoshinoBotClanRankSearchPlugin)**：使用查询指令后，机器人会从镜华会战名次查询网获取数据，把需要查询的公会的会战当前名次或历史名次发送到群里。这个插件功能刚写到一半就开巨蟹座会战了，所以功能比较简陋。打完会战发现github上有不少同类型的功能更完善的插件，所以就弃坑了(笑)。
  
 ## 此仓库插件介绍(基于Mirai开发)
- ##### 猜角色小游戏插件pcrdescguess
+ #### 猜角色小游戏插件pcrdescguess
 |指令|说明|
 |-----|-----|
 |猜角色|机器人会随机给出角色的一些描述，群友需要根据这些描述猜出是哪个角色|
 |猜角色排行榜|显示猜角色小游戏猜对次数的群排行榜|
 
- ##### 猜头像小游戏插件pcravatarguess
+ #### 猜头像小游戏插件pcravatarguess
 |指令|说明|
 |-----|-----|
 |猜头像|机器人会发送某个角色头像随机截取的一小部分，群友需要猜出它来自哪个角色头像|
