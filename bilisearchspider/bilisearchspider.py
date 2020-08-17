@@ -118,7 +118,8 @@ async def spider_work(spider:BaseSpider, bot, gid, sv:Service, TAG):
         pic_path = './hoshino/modules/bilisearchspider/{}.jpg'.format(updates[i].idx.split('/')[-1])
         await download('http:'+updates[i].pic, pic_path)
         pic = MessageSegment.image(f'file:///{os.path.abspath(pic_path)}')
-        await bot.send_group_msg(group_id=int(gid), message=msg_list[0] + pic + msg_list[i+1])
+        msg = f'{msg_list[0]}{pic}{msg_list[i+1]}'
+        await bot.send_group_msg(group_id=int(gid), message=msg)
         if os.path.exists(pic_path): os.remove(pic_path) 
 
 
