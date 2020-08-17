@@ -139,8 +139,8 @@ async def avatar_guess(bot, ev: CQEvent):
         file_path = os.path.join(dir_path, 'cropped_avatar.png')
         cropped.save(file_path)
         image = MessageSegment.image(f'file:///{os.path.abspath(file_path)}')   
-        msg = f'猜猜这个图片是哪位角色头像的一部分?({ONE_TURN_TIME}s后公布答案)'
-        await bot.send(ev, msg + image)
+        msg = f'猜猜这个图片是哪位角色头像的一部分?({ONE_TURN_TIME}s后公布答案){image}'
+        await bot.send(ev, msg)
         await asyncio.sleep(ONE_TURN_TIME)
         if winner_judger.winner != '':
             winner_judger.turn_off()
