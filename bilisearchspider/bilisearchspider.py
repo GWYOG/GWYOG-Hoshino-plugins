@@ -49,7 +49,7 @@ class BiliSearchSpider(BaseSpider):
         for url in cls.url[gid]:
             resp = await cls.get_response(url)
             items = await cls.get_items(resp)
-            updates_all.extend([i for i in items if i.idx not in cls.idx_cache[gid]])
+            updates_all.extend([i for i in items if i.idx not in cls.idx_cache[gid] and i not in updates_all])
             items_all.extend(items)
         if updates_all:
             cls.idx_cache[gid] = set(i.idx for i in items_all)
@@ -120,7 +120,6 @@ async def spider_work(spider:BaseSpider, bot, gid, sv:Service, TAG):
         pic = MessageSegment.image(f'file:///{os.path.abspath(pic_path)}')
         msg = f'{msg_list[0]}{pic}{msg_list[i+1]}'
         await bot.send_group_msg(group_id=int(gid), message=msg)
-        if os.path.exists(pic_path): os.remove(pic_path) 
 
 
 @sv.on_prefix('添加B站爬虫')
@@ -173,10 +172,14 @@ async def delete_spider_keyword(bot, ev: CQEvent):
     await bot.send(ev, msg)
 
 
-@sv.scheduled_job('cron', minute='*/5', second='30', jitter=20)
+@sv.scheduled_job('cron', minute='*/3', second='30', jitter=20)
 async def bili_search_spider():
     bot = hoshino.get_bot()
     config = load_config()
     for gid in config.keys():
         BiliSearchSpider.set_url(gid, config[gid])
         await spider_work(BiliSearchSpider, bot, gid, sv, 'B站搜索爬虫')
+    for root, dirs, files in os.walk('./hoshino/modules/bilisearchspider'):
+        for name in files:
+            if name.endswith('.jpg'):
+                os.remove(os.path.join(root, name))
