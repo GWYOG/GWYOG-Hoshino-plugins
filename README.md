@@ -1,11 +1,11 @@
 # 公主连结实用/娱乐插件 for HoshinoBot on Mirai
 
-A repository for [HoshinoBot](https://github.com/Ice-Cirno/HoshinoBot) based [PCR](http://priconne-redive.jp/) plugins made by myself.
+A repository for [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) based [PCR](http://priconne-redive.jp/) plugins made by myself.
 
 
 ## 简介
 
-一些基于 [HoshinoBot](https://github.com/Ice-Cirno/HoshinoBot) 开发的公主连结实用插件或有趣的娱乐插件，开发环境为Mirai。
+一些基于 [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) 开发的公主连结实用插件或有趣的娱乐插件，开发环境为Mirai(目前用的是cqhttp-mirai, 之后会兼容go-cqhttp)
 
 其他还有一些之前在酷Q Pro环境下开发的HoshinoBot插件，我没迁移到此仓库中，不过它们基本都可以直接装在Mirai的HoshinoBot上，它们是：
 
@@ -13,7 +13,7 @@ A repository for [HoshinoBot](https://github.com/Ice-Cirno/HoshinoBot) based [PC
 
 - **[box统计插件](https://github.com/GWYOG/HoshinoBotBoxCollectionPlugin)**：加入指令，在管理员设定好需要统计的角色星级后，机器人会自动私聊指定人员询问并统计汇总他们的角色星级。统计完毕后，在群内可以使用指令方便的查看分类汇总的统计结果；也可以自动生成统计结果的csv文件，或者把统计结果的表格以图片形式发送到群中(这个功能很实用!)。
 
-- **[猜语音小游戏插件](https://github.com/GWYOG/HoshinoBotVoiceGuessPlugin)**：机器人会自动从干炸里脊资源站下载所有角色的打开游戏时说的的那句"cygames"语音。之后机器人会随机发送一句语音到群里，让群友猜猜是哪位角色说的，并在一定时间后公布正确答案和猜对的人。由于只有较高版本的cqhttp-mirai支持发送语音，这个插件装在HoshinoBot-mirai上时需要适当注意。
+- **[猜语音小游戏插件](https://github.com/GWYOG/HoshinoBotVoiceGuessPlugin)**：机器人会自动从干炸里脊资源站下载所有角色的打开游戏时说的的那句"cygames"语音。之后机器人会随机发送一句语音到群里，让群友猜猜是哪位角色说的，并在一定时间后公布正确答案和猜对的人。由于只有embedded版本的cqhttp-mirai支持发送语音，且只支持发送amr而非m4a格式的语音(go-cqhttp也是一样)，此插件目前暂时无法用在Mirai上。
 
 - **[会战名次查询插件](https://github.com/GWYOG/HoshinoBotClanRankSearchPlugin)**：使用查询指令后，机器人会从镜华会战名次查询网获取数据，把需要查询的公会的会战当前名次或历史名次发送到群里。这个插件功能刚写到一半就开巨蟹座会战了，所以功能比较简陋。打完会战发现github上有不少同类型的功能更完善的插件，所以就弃坑了(笑)。
  
