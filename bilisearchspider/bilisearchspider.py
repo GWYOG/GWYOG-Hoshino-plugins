@@ -172,7 +172,7 @@ async def delete_spider_keyword(bot, ev: CQEvent):
     await bot.send(ev, msg)
 
 
-@sv.scheduled_job('cron', minute='*/3', second='30', jitter=20)
+@sv.scheduled_job('cron', minute='*/5', second='30', jitter=20)
 async def bili_search_spider():
     bot = hoshino.get_bot()
     config = load_config()
