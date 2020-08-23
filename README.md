@@ -44,6 +44,16 @@ A repository for [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) based
 |查看B站爬虫|查看当前爬取关键词列表|
 |删除B站爬虫 <关键词>|删除指定爬取关键词|
 
+ #### nga会战爬虫ngaclanbattlespider
+ 顾名思义，这是爬取nga会战相关帖子的HoshinoBot爬虫插件。目前内置的关键词只会爬取一些有价值信息的帖子，包括但不限于会战轴。无意义的感叹帖、水贴不会爬取。目前暂不支持外部指令添加自定义关键词。
+ 
+注意！安装此插件需先安装第三方库`selenium`，并配置好chrome和chromedriver，windows系统可参考[这篇文章](https://www.jianshu.com/p/64c92b1c05dd)。之后再使用通常方法安装此插件到HoshinoBot上。
+ 
+|指令|说明|
+|-----|-----|
+|启用nga会战爬虫 [国服/日服/台服]|启用nga会战爬虫并设置爬取版块为:国服讨论/日服讨论/台服讨论，默认是国服讨论。每隔一段时间爬虫将自动爬取nga会战相关帖子|
+|禁用nga会战爬虫|关闭nga会战爬虫服务|
+
 ## 安装方式
 
 1. clone或者下载此仓库的代码
@@ -52,6 +62,7 @@ A repository for [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) based
   
 3. 打开`hoshino/config/`文件夹中的`__bot__.py`文件，在`MODULES_ON`中加入插件的名称。比如如果想安装pcrdescguess插件，那么就加入一行`'pcrdescguess',`
 
+4. 个别插件可能需要安装额外的第三方库。如果插件有需要安装的前置依赖，我在此README的插件介绍一节中注明。
 
 ## 注意事项
  最好事先下载全角色头像放在HoshinoBot的资源文件夹中。虽然机器人在发现需要发送的角色头像缺失时也会自动从干炸里脊资源站下载，不过这样机器人会变卡。
