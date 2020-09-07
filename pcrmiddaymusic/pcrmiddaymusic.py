@@ -85,20 +85,22 @@ async def get_next_song(gid):
     return song_info, song_data
 
 
+def get_music_from_song_data(song_data):
+    if song_data[0] == 'bili':
+        return MessageSegment.share(url='https://www.bilibili.com/video/' + song_data[1], title=song_data[3],
+                                     content=song_data[4],
+                                     image_url="http://i0.hdslb.com/bfs/archive/b28c463d04db58f6eb79e238757b78ab1f609ec0.png")
+    else:
+        return MessageSegment.music(type_=song_data[0], id_=song_data[1])
+
+
 @sv.on_fullmatch('来点音乐')
 async def music_push(bot, ev: CQEvent):
     if ev.group_id in config_using:
         return
     song_info, song_data = await get_next_song(ev.group_id)
-    if song_data[0] == 'bili':
-        song_link = f'\nhttps://www.bilibili.com/video/{song_data[1]}'
-    elif song_data[0] == 'qq':
-        song_link = f'\nhttps://i.y.qq.com/v8/playsong.html?_wv=1&songid={song_data[1]}&souce=qqshare&source=qqshare&ADTAG=qqshare'
-    elif song_data[0] == '163':
-        song_link = f'\nhttp://music.163.com/m/song/{song_data[1]}'
-    else:
-        song_link = ''
-    await bot.send(ev, song_info+song_link)
+    await bot.send(ev, song_info)
+    await bot.send(ev, get_music_from_song_data(song_data))
 
 
 @sv.scheduled_job('cron', hour=12, minute=9, jitter=30)
@@ -108,10 +110,6 @@ async def music_daily_push():
     info_head = '今日份的午间音乐广播~'
     for gid, selfids in glist.items():
         song_info, song_data = await get_next_song(gid)
-        if song_data[0] == 'bili':
-            music = MessageSegment.share(url='https://www.bilibili.com/video/'+song_data[1], title = song_data[3], content = song_data[4], image_url = "http://i0.hdslb.com/bfs/archive/b28c463d04db58f6eb79e238757b78ab1f609ec0.png")
-        else:
-            music = MessageSegment.music(type_=song_data[0], id_=song_data[1])
         await bot.send_group_msg(self_id=random.choice(selfids), group_id=gid, message=info_head+song_info)
-        await bot.send_group_msg(self_id=random.choice(selfids), group_id=gid, message=music)
+        await bot.send_group_msg(self_id=random.choice(selfids), group_id=gid, message=get_music_from_song_data(song_data))
         await asyncio.sleep(0.5)
