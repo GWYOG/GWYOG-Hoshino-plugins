@@ -61,25 +61,27 @@ async def get_pic_url(bv):
     return content['data']['pic']
 
 
+async def get_song_info_from_song(song):
+    song_data = _song_data.SONG_DATA[song]
+    pic_url = await get_pic_url(song_data[5]) if song_data[5] else ""
+    img = MessageSegment.image(pic_url) if pic_url else ""
+    msg_part = '' if song_data[6] == '' else '\n-------------------------------------------\n'
+    song_info = song_data[2] + song + str(img) + '歌曲名: ' + song_data[3] + '\n' + '歌手: ' + song_data[4] + msg_part + \
+                song_data[6]
+    return song_info, song_data
+
+
 async def get_next_song(gid):
     with Config(gid, CONFIG_PATH) as config:
         pushed_music = config.load_pushed_music()
         song_dict = _song_data.SONG_DATA
-        songs = list(song_dict.keys())
-        random.shuffle(songs)
-        all_pushed = True
-        for song in songs:
-            if song not in pushed_music:
-                all_pushed = False
-                break
-        if all_pushed:
-            song = songs[0]
+        not_pushed_music = set(song_dict.keys()) - set(pushed_music)
+        if not_pushed_music:
+            song = random.choice(list(not_pushed_music))
+        else:
+            song = random.choice(list(song_dict.keys()))
             pushed_music = []
-        song_data = song_dict[song]
-        pic_url = await get_pic_url(song_data[5]) if song_data[5] else ""
-        img = MessageSegment.image(pic_url) if pic_url else ""
-        msg_part = '' if song_data[6]=='' else '\n-------------------------------------------\n'
-        song_info = song_data[2] + song + str(img) + '歌曲名: ' + song_data[3] + '\n' + '歌手: ' + song_data[4] + msg_part + song_data[6]
+        song_info, song_data = await get_song_info_from_song(song)
         pushed_music.append(song)
         config.save_pushed_music(pushed_music)
     return song_info, song_data
@@ -101,11 +103,33 @@ def get_music_from_song_data(song_data):
         return MessageSegment.music(type_=song_data[0], id_=song_data[1])
 
 
-@sv.on_fullmatch('来点音乐')
+def keyword_search(keyword):
+    song_dict = _song_data.SONG_DATA
+    result = []
+    for song in song_dict:
+        if keyword in song or keyword in song_dict[song][3]:
+            result.append(song)
+    return result
+
+
+@sv.on_prefix(('来点音乐', '来首音乐'))
 async def music_push(bot, ev: CQEvent):
     if ev.group_id in config_using:
         return
-    song_info, song_data = await get_next_song(ev.group_id)
+    s = ev.message.extract_plain_text()
+    if s:
+        available_songs = keyword_search(s)
+        if not available_songs:
+            await bot.send(ev, f'未找到含有关键词"{s}"的歌曲...')
+            return
+        elif len(available_songs) > 1:
+            msg_part = '\n'.join(['• ' + song for song in available_songs])
+            await bot.send(ev, f'从曲库中找到了这些:\n{msg_part}\n您想找的是哪首呢~')
+            return
+        else:
+            song_info, song_data =  await get_song_info_from_song(available_songs[0])
+    else:
+        song_info, song_data = await get_next_song(ev.group_id)
     await bot.send(ev, song_info)
     await bot.send(ev, get_music_from_song_data(song_data))
 
