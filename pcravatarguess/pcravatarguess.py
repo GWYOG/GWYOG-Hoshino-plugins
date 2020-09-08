@@ -136,11 +136,11 @@ async def avatar_guess(bot, ev: CQEvent):
         while True:
             index = random.randint(0, list_len)
             if chara_id_list[index] not in BLACKLIST_ID: break
-        winner_judger.set_correct_chara_id(ev.group_id, chara_id_list[0])
+        winner_judger.set_correct_chara_id(ev.group_id, chara_id_list[index])
         dir_path = os.path.join(os.path.expanduser(hoshino.config.RES_DIR), 'img', 'priconne', 'unit')
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
-        c = chara.fromid(chara_id_list[0])
+        c = chara.fromid(chara_id_list[index])
         img = c.icon.open()
         left = math.floor(random.random()*(129-PIC_SIDE_LENGTH))
         upper = math.floor(random.random()*(129-PIC_SIDE_LENGTH))
