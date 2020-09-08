@@ -90,6 +90,13 @@ def get_music_from_song_data(song_data):
         return MessageSegment.share(url='https://www.bilibili.com/video/' + song_data[1], title=song_data[3],
                                      content=song_data[4],
                                      image_url="http://i0.hdslb.com/bfs/archive/b28c463d04db58f6eb79e238757b78ab1f609ec0.png")
+    elif song_data[0] == 'qq':
+        return MessageSegment(type_='music',
+                              data={
+                                  'type': song_data[0],
+                                  'id': str(song_data[1]),
+                                  'content': song_data[4]
+                              })
     else:
         return MessageSegment.music(type_=song_data[0], id_=song_data[1])
 
