@@ -39,6 +39,8 @@ A repository for [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) based
  
  需要注意的是，由于B站搜索引擎的特点，设定单一关键词“狮子座公会战”并不能把所有相关视频都搜出来。比如起名“狮子座工会战B2130W轴”的视频就没法靠这个关键词搜出来。这时需要再添加另一个关键词“狮子座会战”。插件支持任意多的关键词，这些关键词搜索出视频的并集会被推送到群里。
  
+ 特别地，如果设置的关键词是up主名字，使用这个插件等价于自动收到这个up主新投稿的提醒。
+ 
  只要存在关键词爬虫就会自动启动，如果想停用请使用指令把关键词全删掉。
 |指令|说明|
 |-----|-----|
@@ -87,7 +89,7 @@ A repository for [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) based
 
 anticoncurrency插件解决了这一问题。给插件设置好不想并发的指令后，只有当一个指令执行完毕，另一个指令才会被机器人接受并开始执行，否则会自动忽略。
 
-从理论上来说，在设置好相关参数后，这个插件可以防止任何插件(哪怕被魔改过)的指令出现并发。适用范围很广。
+从理论上来说，在设置好相关参数后，这个插件可以防止任何插件(哪怕被魔改过)的指令出现并发，适用范围很广。
 
 安装和使用方式：先用常规方式安装插件进HoshinoBot，然后使用notepad++之类的文本编辑器打开文件`anticoncurrency/anti_concurrency.py`，参照里面的注释修改`ANTI_CONCURRENCY_GROUPS`和`SELF_CONCURRENCY`的值。之后再启动bot就可以了。
 
