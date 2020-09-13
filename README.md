@@ -5,9 +5,9 @@ A repository for [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) based
 
 ## 简介
 
-一些基于 [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) 开发的公主连结实用插件或有趣的娱乐插件，开发环境为Mirai(开发环境用的是go-cqhttp，插件在cqhttp-mirai上也可以正常使用)。
+一些基于 [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) 开发的公主连结实用插件或有趣的娱乐插件，开发环境为Mirai(开发环境用的是[go-cqhttp](https://github.com/Mrs4s/go-cqhttp)，理论上插件也能在[cqhttp-mirai](https://github.com/yyuueexxiinngg/cqhttp-mirai)上正常使用。但由于这两个cqhttp本身也在不断更新，如果有插件出现不兼容的情况欢迎开issue反馈)。
 
-其他还有4(3?)个之前在酷Q Pro环境下开发的HoshinoBot插件，我没迁移到此仓库中，不过它们基本都可直接装在Mirai的HoshinoBot上，它们是：
+其他还有4(3?)个之前在酷Q Pro环境下开发的HoshinoBot插件，我没迁移到此仓库中，它们基本都可以直接装在Mirai的HoshinoBot上，它们是：
 
 - **[轴管理插件](https://github.com/GWYOG/HoshinoBotTimelinePlugin)**：（支持Mirai）加入了向机器人录入图片或者文字轴的指令，之后可以方便地查询数据库中存放的轴。此插件可使公会在会战中更方便的查询、交流、优化轴，也可以让几个公会之间共享轴。
 
