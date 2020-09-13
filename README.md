@@ -5,7 +5,7 @@ A repository for [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) based
 
 ## 简介
 
-一些基于 [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) 开发的公主连结实用插件或有趣的娱乐插件，开发环境为Mirai(开发环境用的是[go-cqhttp](https://github.com/Mrs4s/go-cqhttp)，理论上插件也能在[cqhttp-mirai](https://github.com/yyuueexxiinngg/cqhttp-mirai)上正常使用。但由于这两个cqhttp本身也在不断更新，如果有插件出现不兼容的情况欢迎开issue反馈)。
+一些基于 [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) 开发的公主连结实用插件或有趣的娱乐插件，开发环境为Mirai。(开发环境用的是[go-cqhttp](https://github.com/Mrs4s/go-cqhttp)，理论上绝大部分插件也能在[cqhttp-mirai](https://github.com/yyuueexxiinngg/cqhttp-mirai)上使用，但由于cqhttp-mirai最近没更新，进而导致cqhttp-mirai还未实现部分插件所用的的CQ码，因此会出现一些不兼容的情况，建议尽量还是使用go-cqhttp)
 
 其他还有4(3?)个之前在酷Q Pro环境下开发的HoshinoBot插件，我没迁移到此仓库中，它们基本都可以直接装在Mirai的HoshinoBot上，它们是：
 
