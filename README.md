@@ -13,7 +13,7 @@ A repository for [HoshinoBot(V2)](https://github.com/Ice-Cirno/HoshinoBot) based
 
 - **[box统计插件](https://github.com/GWYOG/HoshinoBotBoxCollectionPlugin)**：（支持Mirai）加入指令，在管理员设定好需要统计的角色星级后，机器人会自动私聊指定人员询问并统计汇总他们的角色星级。统计完毕后，在群内可以使用指令方便的查看分类汇总的统计结果；也可以自动生成统计结果的csv文件，或者把统计结果的表格以图片形式发送到群中(这个功能很实用!)。
 
-- **[猜语音小游戏插件](https://github.com/GWYOG/HoshinoBotVoiceGuessPlugin)**：（代码已重构，支持Mirai。语音需要自己转码，具体流程请参照猜语音插件代码仓库的README）机器人会自动从干炸里脊资源站下载所有角色的打开游戏时说的的那句"cygames"语音。之后机器人会随机发送一句语音到群里，让群友猜猜是哪位角色说的。
+- **[猜语音小游戏插件](https://github.com/GWYOG/HoshinoBotVoiceGuessPlugin)**：（代码已重构，支持Mirai。如果用的是go-cqhttp，那么语音需要自己转码，具体流程请参看猜语音插件代码仓库的README）机器人会自动从干炸里脊资源站下载所有角色的打开游戏时说的的那句"cygames"语音。之后机器人会随机发送一句语音到群里，让群友猜猜是哪位角色说的。
 
 - **[会战名次查询插件](https://github.com/GWYOG/HoshinoBotClanRankSearchPlugin)**：（已弃坑，勿用）使用查询指令后，机器人会从镜华会战名次查询网获取数据，把需要查询的公会的会战当前名次或历史名次发送到群里。这个插件功能刚写到一半就开巨蟹座会战了，所以功能比较简陋。打完会战发现github上有不少同类型的功能更完善的插件，所以就弃坑了(笑)。
  
