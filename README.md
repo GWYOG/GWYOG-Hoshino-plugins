@@ -96,7 +96,7 @@ anticoncurrency插件解决了这一问题。给插件设置好不想并发的�
 ## 8. 戳机器人集卡小游戏pokemanpcr
 试试戳一戳机器人~ 她可能会回戳你，也可能会送你随机的公主连结角色卡片，尝试通过卡片交换和融合实现卡片全收集吧！
 
-插件需要 go-cqhttp v0.9.25+, 并在配置文件中把protocol改成Android Phone，详见go-cqhttp的[doc](https://github.com/Mrs4s/go-cqhttp/blob/master/docs/config.md#%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF)。
+插件需要 go-cqhttp v0.9.25+, 并在配置文件中把protocol改成Android Phone，详见go-cqhttp的[doc](https://github.com/Mrs4s/go-cqhttp/blob/master/docs/config.md#%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF)。此外，插件需要使用字体`arial.ttf`，Linux系统请自行下载字体并放在HoshinoBot的主目录下(即和`run.py`放在同一目录)。
 
 图鉴中的卡片可以自己添加、删除、修改，但请使用相同的命名格式。所用资源来自[干炸里脊资源站](https://redive.estertion.win/)。
 
