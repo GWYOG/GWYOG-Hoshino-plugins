@@ -134,10 +134,14 @@ async def mix_card(bot, ev: CQEvent):
         await bot.finish(ev, f'错误: 无法识别{get_card_name_with_rarity(args[1])}, 若为稀有卡请在前面加上"稀有"二字')
     card1_num = db.get_card_num(ev.group_id, ev.user_id, card1_id)
     card2_num = db.get_card_num(ev.group_id, ev.user_id, card2_id)
-    if card1_num == 0:
-        await bot.finish(ev, f'{get_card_name_with_rarity(args[0])}卡数量不足, 无法献祭')
-    if card2_num == 0:
-        await bot.finish(ev, f'{get_card_name_with_rarity(args[1])}卡数量不足, 无法献祭')
+    if card1_id == card2_id:
+        if card1_num < 2:
+            await bot.finish(ev, f'{get_card_name_with_rarity(args[0])}卡数量不足, 无法献祭')
+    else:
+        if card1_num == 0:
+            await bot.finish(ev, f'{get_card_name_with_rarity(args[0])}卡数量不足, 无法献祭')
+        if card2_num == 0:
+            await bot.finish(ev, f'{get_card_name_with_rarity(args[1])}卡数量不足, 无法献祭')
     # 开始献祭
     total_rarity = get_card_rarity(card1_id) + get_card_rarity(card2_id)
     if total_rarity == 0:
