@@ -16,6 +16,7 @@ GACHA_KEYWORDS = ['所持角色交换Pt', '持有的角色交换Pt', '所持CSP�
 CONFIG_PATH =  './hoshino/modules/pcrsealkiller/config.json'
 PIC_PATH = './hoshino/modules/pcrsealkiller/sealkiller.jpg'
 DEFAULT_GACHA_THRESHOLD = 100   # 海豹判定阈值, 如果抽卡次数小于这个阈值，则被判定为海豹
+STRICT_MODE = True              # 开启严格模式后，如果未发现"NEW"而抽卡次数小于阈值，仍会撤回消息，但是不禁言（宁可错杀也不可放过海豹）
 
 gacha_threshold = Config(CONFIG_PATH)
 ocred_images = {}
@@ -40,10 +41,10 @@ def record_ocr(gid, img):
 
 
 def get_gacha_amount(ocr_result):
-    string = re.search('[0-9]+\(\+[0-9]+\)', str(ocr_result))
+    string = re.search('[0-9]+.\+[0-9]+', str(ocr_result))
     if not string:                              # OCR未识别到抽卡次数
         return 0
-    gacha_amount = string.group(0).split('(')[0]
+    gacha_amount = re.match('[0-9]+', string.group(0)).group(0)
     if len(gacha_amount) > 3:                   # OCR识别到多余数字时
         gacha_amount = gacha_amount[math.floor(len(gacha_amount)/2):]
     return int(gacha_amount) if gacha_amount.isdigit() else 0
@@ -61,8 +62,16 @@ async def check_image(bot, ev, img):
         return False, False
     else:
         if not is_new_gacha(r, get_text_coordinate_y(r, kw)):
-            record_ocr(ev.group_id, img)
-            return False, False
+            if not STRICT_MODE:
+                record_ocr(ev.group_id, img)
+                return False, False
+            else:
+                gacha_amount = get_gacha_amount(r)
+                if not gacha_amount or gacha_amount < int(gacha_threshold.threshold[str(ev.group_id)]):
+                    return True, False
+                else:
+                    record_ocr(ev.group_id, img)
+                    return False, False
         else:
             gacha_amount = get_gacha_amount(r)
             if not gacha_amount:
