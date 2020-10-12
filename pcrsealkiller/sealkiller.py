@@ -21,15 +21,15 @@ gacha_threshold = Config(CONFIG_PATH)
 ocred_images = {}
 
 
-async def is_image_gif(bot, img):
+async def is_image_gif_or_meme(bot, img):   # 原有基础上添加表情包过滤功能，感谢HoshinoBot群友们的创意
     r = await bot.call_action(action='get_image', file=img)
-    return r['filename'].endswith('gif')
+    return r['filename'].endswith('gif') or r['size'] < 100000
 
 
 async def is_possible_gacha_image(bot, ev, img):
-    is_gif = await is_image_gif(bot, img)
+    is_gif_or_meme = await is_image_gif_or_meme(bot, img)
     is_ocred = ev.group_id in ocred_images and img in ocred_images[ev.group_id]
-    return not (is_gif or is_ocred)
+    return not (is_gif_or_meme or is_ocred)
 
 
 def record_ocr(gid, img):
