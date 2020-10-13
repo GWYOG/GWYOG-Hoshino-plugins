@@ -12,7 +12,7 @@ sv = Service('pcr-seal-killer', bundle='pcr娱乐', help_='''
 禁用海豹杀手：关闭海豹杀手服务，减轻机器人运行开销
 '''.strip())
 
-GACHA_KEYWORDS = ['所持角色交换Pt', '持有的角色交换Pt', '所持CSPキャラ交換Pt']
+GACHA_KEYWORDS = ['所持角色交换Pt', '持有的角色交换Pt', '持有的角色交換Pt', '所持CSPキャラ交換Pt']
 CONFIG_PATH =  './hoshino/modules/pcrsealkiller/config.json'
 PIC_PATH = './hoshino/modules/pcrsealkiller/sealkiller.jpg'
 DEFAULT_GACHA_THRESHOLD = 100   # 海豹判定阈值, 如果抽卡次数小于这个阈值，则被判定为海豹
@@ -24,7 +24,7 @@ ocred_images = {}
 
 async def is_image_gif_or_meme(bot, img):   # 原有基础上添加表情包过滤功能，感谢HoshinoBot群友们的创意
     r = await bot.call_action(action='get_image', file=img)
-    return r['filename'].endswith('gif') or r['size'] < 100000
+    return r['filename'].endswith('gif') or r['size'] < 50000
 
 
 async def is_possible_gacha_image(bot, ev, img):
