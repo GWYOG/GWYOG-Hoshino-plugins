@@ -12,7 +12,7 @@ sv = Service('pcr-seal-killer', bundle='pcr娱乐', help_='''
 禁用海豹杀手：关闭海豹杀手服务，减轻机器人运行开销
 '''.strip())
 
-GACHA_KEYWORDS = ['所持角色交换Pt', '持有的角色交换Pt', '持有的角色交換Pt', '所持CSPキャラ交換Pt', '所持キャラ交換Pt', '所持キャラ交换Pt']
+GACHA_KEYWORDS = ['所持角色交换Pt', '持有的角色交換Pt', '所持キャラ交換Pt', '持有的角色交换Pt', '所持キャラ交换Pt', '所持CSPキャラ交換Pt']
 CONFIG_PATH =  './hoshino/modules/pcrsealkiller/config.json'
 PIC_PATH = './hoshino/modules/pcrsealkiller/sealkiller.jpg'
 DEFAULT_GACHA_THRESHOLD = 100   # 海豹判定阈值, 如果抽卡次数小于这个阈值，则被判定为海豹
