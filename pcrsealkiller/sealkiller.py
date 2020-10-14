@@ -1,6 +1,9 @@
+import importlib
 import math
 import os
 import re
+
+import aiohttp
 
 from hoshino import Service, util, priv
 from hoshino.modules.pcrsealkiller import Config
@@ -13,13 +16,18 @@ sv = Service('pcr-seal-killer', bundle='pcr娱乐', help_='''
 '''.strip())
 
 GACHA_KEYWORDS = ['所持角色交换Pt', '持有的角色交換Pt', '所持キャラ交換Pt', '持有的角色交换Pt', '所持キャラ交换Pt', '所持CSPキャラ交換Pt']
-CONFIG_PATH =  './hoshino/modules/pcrsealkiller/config.json'
-PIC_PATH = './hoshino/modules/pcrsealkiller/sealkiller.jpg'
+FILE_FOLDER_PATH = './hoshino/modules/pcrsealkiller/'
+CONFIG_PATH =  f'{FILE_FOLDER_PATH}config.json'
+PIC_PATH = f'{FILE_FOLDER_PATH}sealkiller.jpg'
 DEFAULT_GACHA_THRESHOLD = 100   # 海豹判定阈值, 如果抽卡次数小于这个阈值，则被判定为海豹
 STRICT_MODE = True              # 开启严格模式后，如果未发现"NEW"而抽卡次数小于阈值，仍会撤回消息，但是不禁言（宁可错杀也不可放过海豹）
+USE_OPENCV = True               # 是否使用Opencv提高识别精确度
+
 
 gacha_threshold = Config(CONFIG_PATH)
 ocred_images = {}
+if USE_OPENCV:
+    opencv_util = importlib.import_module('hoshino.modules.pcrsealkiller._opencv_util')
 
 
 async def is_image_gif_or_meme(bot, img):   # 原有基础上添加表情包过滤功能，感谢HoshinoBot群友们的创意
@@ -50,6 +58,15 @@ def get_gacha_amount(ocr_result):
     return int(gacha_amount) if gacha_amount.isdigit() else 0
 
 
+async def download(url, path):
+    timeout = aiohttp.ClientTimeout(total=60)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
+        async with session.get(url) as resp:
+            content = await resp.read()
+            with open(path, 'wb') as f:
+                f.write(content)
+
+
 # 返回: 是否需要撤回 是否需要禁言
 async def check_image(bot, ev, img):
     try:
@@ -62,16 +79,48 @@ async def check_image(bot, ev, img):
         return False, False
     else:
         if not is_new_gacha(r, get_text_coordinate_y(r, kw)):
-            if not STRICT_MODE:
-                record_ocr(ev.group_id, img)
-                return False, False
-            else:
-                gacha_amount = get_gacha_amount(r)
-                if not gacha_amount or gacha_amount < int(gacha_threshold.threshold[str(ev.group_id)]):
-                    return True, False
-                else:
+            if not USE_OPENCV:
+                if not STRICT_MODE:
                     record_ocr(ev.group_id, img)
                     return False, False
+                else:
+                    gacha_amount = get_gacha_amount(r)
+                    if not gacha_amount or gacha_amount < int(gacha_threshold.threshold[str(ev.group_id)]):
+                        return True, False
+                    else:
+                        record_ocr(ev.group_id, img)
+                        return False, False
+            else:
+                image_path = f'{FILE_FOLDER_PATH}{img}.jpg'
+                image_info = await bot.call_action(action='get_image', file=img)
+                await download(image_info['url'], image_path)
+                new_gacha, error = opencv_util.check_new_gacha(image_path)
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+                if new_gacha:
+                    gacha_amount = get_gacha_amount(r)
+                    if not gacha_amount:
+                        return True, False
+                    elif gacha_amount < int(gacha_threshold.threshold[str(ev.group_id)]):
+                        return True, True
+                    else:
+                        record_ocr(ev.group_id, img)
+                        return False, False
+                else:
+                    if not error:
+                        record_ocr(ev.group_id, img)
+                        return False, False
+                    else:
+                        if not STRICT_MODE:
+                            record_ocr(ev.group_id, img)
+                            return False, False
+                        else:
+                            gacha_amount = get_gacha_amount(r)
+                            if not gacha_amount or gacha_amount < int(gacha_threshold.threshold[str(ev.group_id)]):
+                                return True, False
+                            else:
+                                record_ocr(ev.group_id, img)
+                                return False, False
         else:
             gacha_amount = get_gacha_amount(r)
             if not gacha_amount:
