@@ -134,7 +134,7 @@ async def music_push(bot, ev: CQEvent):
     await bot.send(ev, get_music_from_song_data(song_data))
 
 
-@sv.scheduled_job('cron', hour=12, minute=9, jitter=30)
+@sv.scheduled_job('cron', hour=12, minute=9)
 async def music_daily_push():
     bot = hoshino.get_bot()
     glist = await sv.get_enable_groups()
