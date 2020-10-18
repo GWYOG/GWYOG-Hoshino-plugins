@@ -8,12 +8,14 @@ from . import *
 from ...util import DailyNumberLimiter
 
 
-DIR_PATH = './hoshino/modules/pokemanpcr/image'
+__BASE = os.path.split(os.path.realpath(__file__))
+DIR_PATH = os.path.join(__BASE[0],'image')
 DB_PATH = os.path.expanduser("~/.hoshino/poke_man_pcr.db")
 REQUEST_VALID_TIME = 60     # 换卡请求的等待时间
 POKE_DAILY_LIMIT = 5        # 每人每天戳机器人获得卡片的数量上限
 COL_NUM = 8                 # 查看仓库时每行显示的卡片个数
 
+PRELOAD=True               # 是否启动时直接将所有图片加载到内存中以提高查看仓库的速度(增加约几M内存消耗)
 
 sv = Service('poke-man-pcr', bundle='pcr娱乐', help_='''
 戳一戳机器人, 她可能会送你公主连结卡片哦~
@@ -32,15 +34,33 @@ card_file_names_normal = [file_name for file_name in card_file_names_all if file
 card_file_names_rare = [file_name for file_name in card_file_names_all if file_name.startswith('32')]
 cards = [int(file_name.split('.')[0]) for file_name in card_file_names_all]
 
+# 图像缓存
+image_cache = {}
+if PRELOAD:
+    image_list = os.listdir(DIR_PATH)
+    for image in image_list:
+        image_path = os.path.join(DIR_PATH, image)
+        image_cache[image] = Image.open(image_path)
+
 
 def get_pic(pic_path, card_num):
-    img = Image.open(pic_path)
+    if PRELOAD:
+        # 拆分路径和文件名
+        pic_name = os.path.split(pic_path)[1]
+        img = image_cache[pic_name]
+    else:
+        img = Image.open(pic_path)
     img = img.resize((80, 80), Image.ANTIALIAS)
     return draw_num_text(img, card_num)
 
 
 def get_grey_pic(pic_path):
-    img = Image.open(pic_path).convert('L')
+    if PRELOAD:
+        # 拆分路径和文件名
+        pic_name = os.path.split(pic_path)[1]
+        img = image_cache[pic_name].convert('L')
+    else:
+        img = Image.open(pic_path).convert('L')
     img = img.resize((80, 80), Image.ANTIALIAS)
     return img
 
@@ -129,9 +149,9 @@ async def mix_card(bot, ev: CQEvent):
     card1_id = get_card_id(args[0])
     card2_id = get_card_id(args[1])
     if not card1_id or card1_id not in cards:
-        await bot.finish(ev, f'错误: 无法识别{get_card_name_with_rarity(args[0])}, 若为稀有卡请在前面加上"稀有"二字')
+        await bot.finish(ev, f'错误: 无法识别{args[0]}, 若为稀有卡请在前面加上"稀有"二字')
     if not card2_id or card2_id not in cards:
-        await bot.finish(ev, f'错误: 无法识别{get_card_name_with_rarity(args[1])}, 若为稀有卡请在前面加上"稀有"二字')
+        await bot.finish(ev, f'错误: 无法识别{args[1]}, 若为稀有卡请在前面加上"稀有"二字')
     card1_num = db.get_card_num(ev.group_id, ev.user_id, card1_id)
     card2_num = db.get_card_num(ev.group_id, ev.user_id, card2_id)
     if card1_id == card2_id:
