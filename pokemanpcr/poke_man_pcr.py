@@ -13,7 +13,7 @@ DIR_PATH = os.path.join(__BASE[0],'image')
 DB_PATH = os.path.expanduser("~/.hoshino/poke_man_pcr.db")
 REQUEST_VALID_TIME = 60     # 换卡请求的等待时间
 POKE_DAILY_LIMIT = 5        # 每人每天戳机器人获得卡片的数量上限
-COL_NUM = 8                 # 查看仓库时每行显示的卡片个数
+COL_NUM = 15                 # 查看仓库时每行显示的卡片个数
 
 PRELOAD=True               # 是否启动时直接将所有图片加载到内存中以提高查看仓库的速度(增加约几M内存消耗)
 
