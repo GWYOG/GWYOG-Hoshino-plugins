@@ -141,6 +141,7 @@ async def music_daily_push():
     info_head = '今日份的午间音乐广播~'
     for gid, selfids in glist.items():
         song_info, song_data = await get_next_song(gid)
-        await bot.send_group_msg(self_id=random.choice(selfids), group_id=gid, message=info_head+song_info)
-        await bot.send_group_msg(self_id=random.choice(selfids), group_id=gid, message=get_music_from_song_data(song_data))
-        await asyncio.sleep(0.5)
+        sid = random.choice(selfids)
+        await bot.send_group_msg(self_id=sid, group_id=gid, message=info_head+song_info)
+        await bot.send_group_msg(self_id=sid, group_id=gid, message=get_music_from_song_data(song_data))
+        await asyncio.sleep(2)
