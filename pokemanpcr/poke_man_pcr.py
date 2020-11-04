@@ -1,4 +1,4 @@
-import math, random
+import math, random, base64
 from PIL import Image, ImageFont, ImageDraw
 
 from hoshino import Service, util
@@ -6,6 +6,7 @@ from hoshino.modules.priconne import chara
 from hoshino.typing import MessageSegment, NoticeSession, CQEvent
 from . import *
 from ...util import DailyNumberLimiter
+from io import BytesIO
 
 
 __BASE = os.path.split(os.path.realpath(__file__))
@@ -251,4 +252,8 @@ async def storage(bot, ev: CQEvent):
     total_card_num = sum(cards_num.values())
     rare_card_num = len([card_id for card_id in cards_num if get_card_rarity(card_id) ])
     normal_card_num = len(cards_num) - rare_card_num
-    await bot.send(ev, f'{MessageSegment.at(uid)}的仓库:{MessageSegment.image(util.pic2b64(base))}\n持有卡片数: {total_card_num}\n普通卡收集: {normalize_digit_format(normal_card_num)}/{normalize_digit_format(len(card_file_names_normal))}\n稀有卡收集: {normalize_digit_format(rare_card_num)}/{normalize_digit_format(len(card_file_names_rare))}\n图鉴完成度: {normalize_digit_format(len(cards_num))}/{normalize_digit_format(len(cards))}\n当前群排名: {ranking_desc}')
+    buf = BytesIO()
+    base = base.convert('RGB')
+    base.save(buf,format='JPEG')
+    base64_str = f'base64://{base64.b64encode(buf.getvalue()).decode()}'
+    await bot.send(ev, f'{MessageSegment.at(uid)}的仓库:[CQ:image,file={base64_str}]\n持有卡片数: {total_card_num}\n普通卡收集: {normalize_digit_format(normal_card_num)}/{normalize_digit_format(len(card_file_names_normal))}\n稀有卡收集: {normalize_digit_format(rare_card_num)}/{normalize_digit_format(len(card_file_names_rare))}\n图鉴完成度: {normalize_digit_format(len(cards_num))}/{normalize_digit_format(len(cards))}\n当前群排名: {ranking_desc}')
