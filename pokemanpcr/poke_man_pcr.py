@@ -6,7 +6,7 @@ from hoshino import Service, util
 from hoshino.modules.priconne import chara
 from hoshino.typing import MessageSegment, NoticeSession, CQEvent
 from . import *
-from ...util import DailyNumberLimiter
+from ...util import DailyNumberLimiter, FreqLimiter
 from io import BytesIO
 
 
@@ -17,7 +17,7 @@ DB_PATH = os.path.expanduser("~/.hoshino/poke_man_pcr.db")
 SUPER_RARE_PROBABILITY = 0.08   # 戳一戳获得超稀有卡片的概率
 RARE_PROBABILITY = 0.30         # 戳一戳获得稀有卡片的概率
 REQUEST_VALID_TIME = 60         # 换卡请求的等待时间
-CARDS_EVERY_POKE = 5            # 单次戳机器人获得的卡片数量
+POKE_COOLING_TIME = 3           # 增加冷却时间避免连续点击
 POKE_DAILY_LIMIT = 1            # 每人每天最多戳机器人的次数，超过后机器人不再给卡，只回戳
 GIVE_DAILY_LIMIT = 3            # 每人每天最多接受几次赠卡
 COL_NUM = 17                    # 查看仓库时每行显示的卡片个数
@@ -38,6 +38,7 @@ sv = Service('poke-man-pcr', bundle='pcr娱乐', help_='''
 '''.strip())
 daily_limiter = DailyNumberLimiter(POKE_DAILY_LIMIT)
 daily_give_limiter = DailyNumberLimiter(GIVE_DAILY_LIMIT)
+cooling_time_limiter = FreqLimiter(POKE_COOLING_TIME)
 exchange_request_master = ExchangeRequestMaster(REQUEST_VALID_TIME)
 db = CardRecordDAO(DB_PATH)
 font = ImageFont.truetype('arial.ttf', 16)
@@ -205,6 +206,24 @@ def get_card_id_by_card_name(card_name):
         chara_name_no_prefix = card_name[2:] if card_name.startswith('普通') else card_name
     chara_id = chara.name2id(chara_name_no_prefix)
     return (30000 + rarity * 1000 + chara_id) if chara_id != chara.UNKNOWN and chara_id in chara_ids[star] else 0
+ 
+ 
+# 单次戳机器人获得的卡片数量
+def roll_card_amount():
+    roll = random.random()
+    if roll <= 0.01:
+        CARDS_EVERY_POKE = 10   #大暴击！
+    elif 0.01 < roll <= 0.1:
+        CARDS_EVERY_POKE = 5
+    elif 0.1 < roll <= 0.3:
+        CARDS_EVERY_POKE = 4
+    elif 0.3 < roll <= 0.7:
+        CARDS_EVERY_POKE = 3
+    elif 0.7 < roll <= 0.9:
+        CARDS_EVERY_POKE = 2
+    else:
+        CARDS_EVERY_POKE = 1
+    return CARDS_EVERY_POKE
 
 
 def get_card_id_by_file_name(image_file_name):
@@ -234,6 +253,10 @@ def normalize_digit_format(n):
 
 @sv.on_notice('notify.poke')
 async def poke_back(session: NoticeSession):
+    uid = session.ctx['user_id']
+    if not cooling_time_limiter.check(uid):
+        return
+    cooling_time_limiter.start_cd(uid)
     if session.ctx['target_id'] != session.event.self_id:
         return
     if not daily_limiter.check((session.ctx['group_id'], session.ctx['user_id'])) or random.random() < 0.33:
@@ -243,7 +266,7 @@ async def poke_back(session: NoticeSession):
                               })
         await session.send(poke)
     else:
-        card_ids, rarity_counter, card = get_random_cards(card_file_names_all, CARDS_EVERY_POKE)
+        card_ids, rarity_counter, card = get_random_cards(card_file_names_all, roll_card_amount())
         at_user = MessageSegment.at(session.ctx['user_id'])
         dash =  '----------------------------------------'
         msg_part1 = f'\n超稀有x{rarity_counter[1]}' if rarity_counter[1] else ''
