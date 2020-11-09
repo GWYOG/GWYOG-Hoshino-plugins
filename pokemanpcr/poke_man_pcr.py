@@ -18,7 +18,7 @@ SUPER_RARE_PROBABILITY = 0.08   # 戳一戳获得超稀有卡片的概率
 RARE_PROBABILITY = 0.30         # 戳一戳获得稀有卡片的概率
 REQUEST_VALID_TIME = 60         # 换卡请求的等待时间
 POKE_COOLING_TIME = 3           # 增加冷却时间避免连续点击
-POKE_DAILY_LIMIT = 1            # 每人每天最多戳机器人的次数，超过后机器人不再给卡，只回戳
+POKE_DAILY_LIMIT = 3            # 每人每天最多戳机器人的次数，超过后机器人不再给卡，只回戳
 GIVE_DAILY_LIMIT = 3            # 每人每天最多接受几次赠卡
 COL_NUM = 17                    # 查看仓库时每行显示的卡片个数
 BLACKLIST_CARD = []             # 填写不希望被加载的卡片文件名，以逗号分隔。如['icon_unit_100161.png'], 表示不加载六星猫拳的头像
@@ -83,7 +83,7 @@ def get_pic(pic_path, card_num, rarity):
     else:
         img = Image.open(pic_path)
     img = img.resize((80, 80), Image.ANTIALIAS)
-    return draw_num_text(add_rarity_frame(img, rarity), card_num)
+    return draw_num_text(add_rarity_frame(img, rarity), card_num, True, (0, 0, 0), 0, 0)
 
 
 def get_grey_pic(pic_path, rarity):
@@ -110,7 +110,19 @@ def add_rarity_frame(img, rarity):
     return img
 
 
-def draw_num_text(img, num):
+def add_card_amount(img, card_amount):
+    quantity_base = Image.open(FRAME_DIR_PATH + '/quantity.png')
+    img.paste(quantity_base, (53,54), mask=quantity_base.split()[3])
+    return draw_num_text(img, card_amount, False, (255,255,255), 2, 1)
+
+
+def add_icon(base, icon_name, x, y):
+    icon = Image.open(FRAME_DIR_PATH + f'/{icon_name}')
+    base.paste(icon, (x, y), mask=icon.split()[3])
+    return base
+
+
+def draw_num_text(img, num, draw_base_color, color, offset_x, offset_y):
     draw = ImageDraw.Draw(img)
     n = num if num < 100 else num
     text = f'x{n}'
@@ -120,9 +132,10 @@ def draw_num_text(img, num):
     else:
         offset_r = 10
         offset_t = 9
-    draw.rectangle((59 - offset_r, 60, 75, 77), fill=(255, 255, 255))
-    draw.rectangle((59 - offset_r, 60, 77, 75), fill=(255, 255, 255))
-    draw.text((60-offset_t, 60), text, fill=(0, 0, 0), font=font)
+    if draw_base_color:
+        draw.rectangle((59 - offset_r, 60, 75, 77), fill=(255, 255, 255))
+        draw.rectangle((59 - offset_r, 60, 77, 75), fill=(255, 255, 255))
+    draw.text((60-offset_t+offset_x, 60+offset_y), text, fill=color, font=font)
     return img
 
 
@@ -137,19 +150,41 @@ def get_random_cards_list():
     return cards_list
 
 
-def get_random_cards(card_file_names_list = card_file_names_all, amount = 1):
+def get_random_cards(origin_cards, card_file_names_list = card_file_names_all, amount = 1, bonus = True):
     card_ids = []
     size = 80
-    margin = 5
+    margin = 7
+    margin_offset_x = 6
+    margin_offset_y = 6
     col_num = math.ceil(amount/2)
     row_num = 2 if amount != 1 else 1
-    base = Image.new('RGBA', (col_num * size + (col_num-1) * margin, (row_num * size + (row_num-1) * margin)), (255, 255, 255, 255))
-    rarity_counter = {-1:0, 0:0, 1:0}
+    cards_amount = []
+    extra_bonus = False
+    for i in range(amount):
+        a = roll_extra_bonus() if bonus else 1
+        cards_amount.append(a)
+        if a != 1:
+            extra_bonus = True
+    offset_y = 18 if extra_bonus else 0
+    offset_critical_strike = 7 if extra_bonus else 0
+    size_x, size_y = (col_num * size + (col_num+1) * margin + 2 * margin_offset_x, offset_y + row_num * size + (row_num+1) * margin + 2 * margin_offset_y + offset_critical_strike)
+    base = Image.new('RGBA', (size_x, size_y), (255, 255, 255, 255))
+    frame = Image.open(FRAME_DIR_PATH + '/background.png')
+    frame = frame.resize((size_x, size_y - offset_y), Image.ANTIALIAS)
+    base.paste(frame, (0, offset_y), mask=frame.split()[3])
+    if extra_bonus:
+        base = add_icon(base, 'pokecriticalstrike.png', int(size_x/2) - 71, int(offset_y/2) - 2)
+    card_counter = {}
+    card_descs = []
+    rarity_desc = {1:'超稀有', 0:'稀有', -1:'普通'}
     for i in range(amount):
         random_card = random.choice(card_file_names_list) if card_file_names_list != card_file_names_all else random.choice(get_random_cards_list())
         card_id, rarity = get_card_id_by_file_name(random_card)
-        card_ids.append(card_id)
-        rarity_counter[rarity] += 1
+        card_amount = cards_amount[i]
+        card_counter[card_id] = card_amount
+        new_string = ' 【NEW】' if card_id not in origin_cards else ''
+        card_desc = f'{rarity_desc[rarity]}「{get_chara_name(card_id)[1]}」x{card_amount}{new_string}'
+        card_descs.append(card_desc)
         if PRELOAD:
             img = image_cache[random_card]
         else:
@@ -157,8 +192,14 @@ def get_random_cards(card_file_names_list = card_file_names_all, amount = 1):
         row_index = i // col_num
         col_index = i % col_num
         img = img.resize((size, size), Image.ANTIALIAS)
-        base.paste(add_rarity_frame(img, rarity), (col_index * (size + margin), row_index * (size + margin)))
-    return card_ids, rarity_counter, MessageSegment.image(util.pic2b64(base))
+        img = add_rarity_frame(img, rarity)
+        if card_amount > 1:
+            img = add_card_amount(img, card_amount)
+        coor_x, coor_y = (margin + margin_offset_x + col_index * (size + margin), margin + margin_offset_y + offset_y + offset_critical_strike + row_index * (size + margin))
+        base.paste(img, (coor_x, coor_y), mask=img.split()[3])
+        if card_id not in origin_cards:
+            base = add_icon(base, 'new.png', coor_x + size - 27, coor_y - 5)
+    return card_counter, card_descs, MessageSegment.image(util.pic2b64(base))
 
 
 # 输入'[稀有度前缀][角色昵称]'格式的卡片名, 例如'黑猫','稀有黑猫','超稀有黑猫', 输出角色昵称标准化后的结果如'「凯露」','稀有「凯露」','超稀有「凯露」'
@@ -209,7 +250,7 @@ def get_card_id_by_card_name(card_name):
  
  
 # 单次戳机器人获得的卡片数量
-def roll_card_amount():
+def roll_cards_amount():
     roll = random.random()
     if roll <= 0.01:
         CARDS_EVERY_POKE = 10   #大暴击！
@@ -224,6 +265,17 @@ def roll_card_amount():
     else:
         CARDS_EVERY_POKE = 1
     return CARDS_EVERY_POKE
+
+
+def roll_extra_bonus():
+    roll = random.random()
+    if roll < 0.01:
+        amount = 3
+    elif roll < 0.1:
+        amount = 2
+    else:
+        amount = 1
+    return amount
 
 
 def get_card_id_by_file_name(image_file_name):
@@ -266,15 +318,14 @@ async def poke_back(session: NoticeSession):
                               })
         await session.send(poke)
     else:
-        card_ids, rarity_counter, card = get_random_cards(card_file_names_all, roll_card_amount())
+        card_counter, card_descs, card = get_random_cards(db.get_cards_num(session.ctx['group_id'], session.ctx['user_id']), card_file_names_all,
+                                                          roll_cards_amount(), True)
         at_user = MessageSegment.at(session.ctx['user_id'])
         dash =  '----------------------------------------'
-        msg_part1 = f'\n超稀有x{rarity_counter[1]}' if rarity_counter[1] else ''
-        msg_part2 = f'\n稀有卡x{rarity_counter[0]}' if rarity_counter[0] else ''
-        msg_part3 = f'\n普通卡x{rarity_counter[-1]}' if rarity_counter[-1] else ''
-        await session.send(f'别戳了别戳了o(╥﹏╥)o{card}{at_user}这些卡送给你了, 让我安静会...\n{dash}\n获得了:{msg_part1}{msg_part2}{msg_part3}')
-        for card_id in card_ids:
-            db.add_card_num(session.ctx['group_id'], session.ctx['user_id'], card_id)
+        msg_part = '\n'.join(card_descs)
+        await session.send(f'别戳了别戳了o(╥﹏╥)o{card}{at_user}这些卡送给你了, 让我安静会...\n{dash}\n获得了:\n{msg_part}')
+        for card_id in card_counter.keys():
+            db.add_card_num(session.ctx['group_id'], session.ctx['user_id'], card_id, card_counter[card_id])
         daily_limiter.increase((session.ctx['group_id'], session.ctx['user_id']))
 
 
@@ -310,11 +361,12 @@ async def mix_card(bot, ev: CQEvent):
         cards_list = cards['3']
     else:
         cards_list = cards['6']
-    card_ids, rarity_counter, card = get_random_cards(cards_list)
-    rarity_desc, chara_name = get_chara_name(card_ids[0])
+    card_counter, card_descs, card = get_random_cards(db.get_cards_num(ev.group_id, ev.user_id), cards_list, 1, False)
+    card_id = list(card_counter.keys())[0]
+    rarity_desc, chara_name = get_chara_name(card_id)
     db.add_card_num(ev.group_id, ev.user_id, card1_id, -1)
     db.add_card_num(ev.group_id, ev.user_id, card2_id, -1)
-    db.add_card_num(ev.group_id, ev.user_id, card_ids[0])
+    db.add_card_num(ev.group_id, ev.user_id, card_id)
     await bot.send(ev, f'献祭了两张卡..然后{card}获得了{rarity_desc}「{chara_name}」X1~', at_sender=True)
 
 
