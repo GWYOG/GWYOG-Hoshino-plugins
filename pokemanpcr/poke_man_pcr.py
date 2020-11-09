@@ -3,7 +3,7 @@ from PIL import Image, ImageFont, ImageDraw
 
 import hoshino
 from hoshino import Service, util
-from hoshino.modules.priconne import chara
+from hoshino.modules.priconne import chara, _pcr_data
 from hoshino.typing import MessageSegment, NoticeSession, CQEvent
 from . import *
 from ...util import DailyNumberLimiter, FreqLimiter
@@ -49,6 +49,7 @@ chara_ids = {'1':[], '3':[], '6':[]}
 # 资源预检
 image_cache = {}
 image_list = os.listdir(DIR_PATH)
+admissible_rarity = ['1', '3', '6']
 for image in image_list:
     if not image.startswith('icon_unit_') or image in BLACKLIST_CARD:
         continue
@@ -57,9 +58,11 @@ for image in image_list:
         image_path = os.path.join(DIR_PATH, image)
         image_cache[image] = Image.open(image_path)
     chara_id = int(image[10:14])
-    if chara_id == 1000:
+    if chara_id == 1000 or chara_id not in _pcr_data.CHARA_NAME:
         continue
     rarity = image[14]
+    if rarity not in admissible_rarity or image[15] != '1':
+        continue
     cards[rarity].append(image)
     chara_ids[rarity].append(chara_id)
     card_file_names_all.append(image)
