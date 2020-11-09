@@ -213,10 +213,10 @@ def get_random_cards(origin_cards, card_file_names_list = card_file_names_all, a
 # 输入'[稀有度前缀][角色昵称]'格式的卡片名, 例如'黑猫','稀有黑猫','超稀有黑猫', 输出角色昵称标准化后的结果如'「凯露」','稀有「凯露」','超稀有「凯露」'
 def get_card_name_with_rarity(card_name):
     if card_name.startswith('超稀有'):
-        chara_suffix = card_name[0:2]
+        chara_suffix = card_name[0:3]
         chara_nickname = card_name[3:]
     elif card_name.startswith('稀有'):
-        chara_suffix = card_name[0:1]
+        chara_suffix = card_name[0:2]
         chara_nickname = card_name[2:]
     else:
         chara_suffix = ''
@@ -335,7 +335,6 @@ async def poke_back(session: NoticeSession):
     else:
         card_counter, card_descs, card = get_random_cards(db.get_cards_num(session.ctx['group_id'], session.ctx['user_id']), card_file_names_all,
                                                           roll_cards_amount(), True)
-        at_user = MessageSegment.at(session.ctx['user_id'])
         dash =  '----------------------------------------'
         msg_part = '\n'.join(card_descs)
         await session.send(f'别戳了别戳了o(╥﹏╥)o{card}{at_user}这些卡送给你了, 让我安静会...\n{dash}\n获得了:\n{msg_part}')
