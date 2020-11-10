@@ -47,14 +47,15 @@ cooling_time_limiter = FreqLimiter(POKE_COOLING_TIME)
 exchange_request_master = ExchangeRequestMaster(REQUEST_VALID_TIME)
 db = CardRecordDAO(DB_PATH)
 font = ImageFont.truetype('arial.ttf', 16)
+card_ids = []
 card_file_names_all = []
-cards = {'1':[], '3':[], '6':[]}              # 1,3,6表示不同稀有度
+star2rarity = {'1':-1, '3':0, '6':1}          # 角色头像星级->卡片稀有度
+cards = {'1':[], '3':[], '6':[]}              # 1,3,6表示不同星级的角色头像
 chara_ids = {'1':[], '3':[], '6':[]}
 
 # 资源预检
 image_cache = {}
 image_list = os.listdir(DIR_PATH)
-admissible_rarity = ['1', '3', '6']
 for image in image_list:
     if not image.startswith('icon_unit_') or image in BLACKLIST_CARD:
         continue
@@ -65,11 +66,12 @@ for image in image_list:
     chara_id = int(image[10:14])
     if chara_id == 1000 or chara_id not in _pcr_data.CHARA_NAME:
         continue
-    rarity = image[14]
-    if rarity not in admissible_rarity or image[15] != '1':
+    star = image[14]
+    if star not in star2rarity or image[15] != '1':
         continue
-    cards[rarity].append(image)
-    chara_ids[rarity].append(chara_id)
+    cards[star].append(image)
+    chara_ids[star].append(chara_id)
+    card_ids.append(30000 + star2rarity[star] * 1000 + chara_id)
     card_file_names_all.append(image)
 # 边框缓存
 frame_names = ['superrare.png', 'rare.png', 'normal.png']
@@ -288,13 +290,7 @@ def roll_extra_bonus():
 
 def get_card_id_by_file_name(image_file_name):
     chara_id = int(image_file_name[10:14])
-    star = image_file_name[14]
-    if star == '6':
-        rarity = 1
-    elif star == '3':
-        rarity = 0
-    else:
-        rarity = -1
+    rarity = star2rarity[image_file_name[14]]
     return 30000 + rarity * 1000 + chara_id, rarity
 
 
@@ -469,6 +465,7 @@ async def storage(bot, ev: CQEvent):
     base = Image.open(FRAME_DIR_PATH + '/frame.png')
     base = base.resize((40+COL_NUM*80+(COL_NUM-1)*10, 120+row_num*80+(row_num-1)*10), Image.ANTIALIAS)
     cards_num = db.get_cards_num(ev.group_id, uid)
+    cards_num = {card_id: card_amount for card_id, card_amount in cards_num.items() if card_id in card_ids}
     row_index_offset = 0
     row_offset = 0
     for star in cards.keys():
