@@ -6,7 +6,7 @@ from hoshino import Service, util
 from hoshino.modules.priconne import chara, _pcr_data
 from hoshino.typing import MessageSegment, NoticeSession, CQEvent
 from . import *
-from ...util import DailyNumberLimiter, FreqLimiter
+from ...util import FreqLimiter
 from io import BytesIO
 
 
@@ -23,6 +23,7 @@ POKE_TIP_LIMIT = 1              # 到达每日掉落上限后的短时最多提�
 TIP_CD_LIMIT = 3*60             # 每日掉落上限提示冷却时间
 POKE_COOLING_TIME = 3           # 增加冷却时间避免连续点击
 GIVE_DAILY_LIMIT = 3            # 每人每天最多接受几次赠卡
+RESET_HOUR = 0                  # 每日戳一戳、赠送等指令使用次数的重置时间，0代表凌晨0点，1代表凌晨1点，以此类推
 COL_NUM = 17                    # 查看仓库时每行显示的卡片个数
 BLACKLIST_CARD = []             # 填写不希望被加载的卡片文件名，以逗号分隔。如['icon_unit_100161.png'], 表示不加载六星猫拳的头像
 # 献祭卡片时的获得不同稀有度卡片的概率，-1,0,1表示被献祭卡片的三种稀有度，后面长度为3的列表表示献祭获得卡片三种不同稀有度的概率，要求加和为1
@@ -40,9 +41,9 @@ sv = Service('poke-man-pcr', bundle='pcr娱乐', help_='''
 确认交换: 收到换卡请求后一定时间内输入这个指令可完成换卡
 '''.strip())
 poke_tip_cd_limiter = FreqLimiter(TIP_CD_LIMIT)
-daily_tip_limiter = DailyNumberLimiter(POKE_TIP_LIMIT)
-daily_limiter = DailyNumberLimiter(POKE_DAILY_LIMIT)
-daily_give_limiter = DailyNumberLimiter(GIVE_DAILY_LIMIT)
+daily_tip_limiter = DailyAmountLimiter(POKE_TIP_LIMIT, RESET_HOUR)
+daily_limiter = DailyAmountLimiter(POKE_DAILY_LIMIT, RESET_HOUR)
+daily_give_limiter = DailyAmountLimiter(GIVE_DAILY_LIMIT, RESET_HOUR)
 cooling_time_limiter = FreqLimiter(POKE_COOLING_TIME)
 exchange_request_master = ExchangeRequestMaster(REQUEST_VALID_TIME)
 db = CardRecordDAO(DB_PATH)
