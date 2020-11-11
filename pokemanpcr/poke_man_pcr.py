@@ -14,20 +14,20 @@ __BASE = os.path.split(os.path.realpath(__file__))
 FRAME_DIR_PATH = os.path.join(__BASE[0],'image')
 DIR_PATH = os.path.join(os.path.expanduser(hoshino.config.RES_DIR), 'img', 'priconne', 'unit')
 DB_PATH = os.path.expanduser("~/.hoshino/poke_man_pcr.db")
-POKE_GET_CARDS = 0.25           # 每一戳的卡片掉落几率
+POKE_GET_CARDS = 0.75           # 每一戳的卡片掉落几率
 POKE_DAILY_LIMIT = 3            # 机器人每天掉落卡片的次数
 RARE_PROBABILITY = 0.17         # 戳一戳获得稀有卡片的概率
 SUPER_RARE_PROBABILITY = 0.03   # 戳一戳获得超稀有卡片的概率
 REQUEST_VALID_TIME = 60         # 换卡请求的等待时间
 POKE_TIP_LIMIT = 1              # 到达每日掉落上限后的短时最多提示次数
-TIP_CD_LIMIT = 3*60             # 每日掉落上限提示冷却时间
+TIP_CD_LIMIT = 10*60            # 每日掉落上限提示冷却时间
 POKE_COOLING_TIME = 3           # 增加冷却时间避免连续点击
 GIVE_DAILY_LIMIT = 3            # 每人每天最多接受几次赠卡
 RESET_HOUR = 0                  # 每日戳一戳、赠送等指令使用次数的重置时间，0代表凌晨0点，1代表凌晨1点，以此类推
 COL_NUM = 17                    # 查看仓库时每行显示的卡片个数
 BLACKLIST_CARD = []             # 填写不希望被加载的卡片文件名，以逗号分隔。如['icon_unit_100161.png'], 表示不加载六星猫拳的头像
 # 献祭卡片时的获得不同稀有度卡片的概率，-1,0,1表示被献祭卡片的三种稀有度，后面长度为3的列表表示献祭获得卡片三种不同稀有度的概率，要求加和为1
-MIX_PROBABILITY = {str(list((-1,-1))):[0.8,0.195,0.005], str(list((-1,0))):[0.45,0.5,0.05], str(list((-1,1))):[0.5,0.35,0.15],
+MIX_PROBABILITY = {str(list((-1,-1))):[0.8,0.195,0.005], str(list((-1,0))):[0.45,0.5,0.05], str(list((-1,1))):[0.55,0.35,0.1],
                    str(list((0,0))):[0.1,0.8,0.1],       str(list((0,1))):[0.1,0.7,0.2],      str(list((1,1))):[0.15,0.25,0.6]}
 
 PRELOAD=True                    # 是否启动时直接将所有图片加载到内存中以提高查看仓库的速度(增加约几M内存消耗)
@@ -318,12 +318,14 @@ async def poke_back(session: NoticeSession):
     cooling_time_limiter.start_cd(uid)
     if session.ctx['target_id'] != session.event.self_id:
         return
-    if not daily_limiter.check(guid) and daily_tip_limiter.check(guid) and poke_tip_cd_limiter.check(guid):
-        daily_tip_limiter.increase(guid)
+    if not daily_limiter.check(guid) and not daily_tip_limiter.check(guid):
         poke_tip_cd_limiter.start_cd(guid)
+    if not daily_limiter.check(guid) and poke_tip_cd_limiter.check(guid):
+        daily_tip_limiter.increase(guid)
         await session.send(f'{at_user}你今天戳得已经够多的啦，再戳也不会有奇怪的东西掉下来的~')
+        return
     daily_tip_limiter.reset(guid)
-    if not daily_limiter.check(guid) or random.random() < POKE_GET_CARDS:
+    if not daily_limiter.check(guid) or random.random() > POKE_GET_CARDS:
         poke = MessageSegment(type_='poke',
                               data={
                                   'qq': str(session.ctx['user_id']),
