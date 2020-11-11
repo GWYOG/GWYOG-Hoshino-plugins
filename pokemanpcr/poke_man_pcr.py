@@ -436,7 +436,7 @@ async def give(bot, ev:CQEvent):
     if len(ev.message) != 2 or ev.message[0].type != 'at' or ev.message[1].type != 'text':
         await bot.finish(ev, '参数格式错误, 请重试')
     target_uid = int(ev.message[0].data['qq'])
-    if not daily_limiter.check((ev.group_id, target_uid)):
+    if not daily_give_limiter.check((ev.group_id, target_uid)):
         await bot.finish(ev, f'{MessageSegment.at(target_uid)}的今日接受赠送次数已达上限，明天再送给TA吧~')
     if target_uid == ev.user_id:
         await bot.finish(ev, '不用给自己赠卡~')
