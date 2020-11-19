@@ -1,3 +1,4 @@
+import os
 from PIL import Image
 
 from hoshino.typing import MessageSegment
@@ -8,8 +9,9 @@ JUMP_ID = '-1'
 UNKNOWN_ID = '00000'
 VALID_IDS = [id for id in POSITION if id != UNKNOWN_ID]
 SUB_PIC_SIZE = 80
-BASE_PIC_PATH = './hoshino/modules/pcrmemorygames/AtlasMinigameSrtPanel_shrink.png'
-BACKGROUND_PIC_PATH = './hoshino/modules/pcrmemorygames/Background.png'
+FILE_FOLDER_PATH = os.path.dirname(__file__)
+BASE_PIC_PATH = os.path.join(FILE_FOLDER_PATH,'AtlasMinigameSrtPanel_shrink.png')
+BACKGROUND_PIC_PATH = os.path.join(FILE_FOLDER_PATH,'Background.png')
 
 
 def get_sub_pic_from_id(id, img=Image.open(BASE_PIC_PATH)):

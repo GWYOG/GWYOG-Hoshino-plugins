@@ -2,15 +2,17 @@ import asyncio, json, os, random
 
 import hoshino
 from hoshino import Service, aiorequests
-from hoshino.modules.pcrmiddaymusic import _song_data
+from . import _song_data
 from hoshino.typing import CQEvent, MessageSegment
 
 sv = Service('pcr-midday-music', bundle='pcr娱乐', help_='''
 每日午间自动推送pcr相关音乐, 也可直接在群内发送"来点音乐"请求pcr歌曲
 '''.strip())
 
+FILE_FOLDER_PATH = os.path.dirname(__file__)
+
 config_using = set()
-CONFIG_PATH = './hoshino/modules/pcrmiddaymusic/pushed_music.json'
+CONFIG_PATH = os.path.join(FILE_FOLDER_PATH,'pushed_music.json')
 
 
 class Config:
