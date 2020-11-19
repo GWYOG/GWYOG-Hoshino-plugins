@@ -12,6 +12,7 @@ sv = Service('bili-search-spider', bundle='pcr订阅', help_='''
 删除B站爬虫 <关键词> | 删除指定爬取关键词
 '''.strip())
 
+FILE_FOLDER_PATH=os.path.dirname(__file__)
 
 @dataclass
 class Item:
@@ -74,7 +75,7 @@ class BiliSearchSpider(BaseSpider):
 
 def load_config():
     try:
-        config_path = './hoshino/modules/bilisearchspider/spider_conifg.json'
+        config_path = os.path.join(FILE_FOLDER_PATH,'spider_conifg.json')
         if os.path.exists(config_path):
             with open(config_path, 'r', encoding='utf8') as config_file:
                 return json.load(config_file)
@@ -86,7 +87,7 @@ def load_config():
 
 def save_config(config):
     try:
-        with open('./hoshino/modules/bilisearchspider/spider_conifg.json', 'w', encoding='utf8') as config_file:
+        with open(os.path.join(FILE_FOLDER_PATH,'spider_conifg.json'), 'w', encoding='utf8') as config_file:
             json.dump(config, config_file, ensure_ascii=False, indent=4)
         return True
     except:

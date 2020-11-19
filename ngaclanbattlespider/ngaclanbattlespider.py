@@ -15,6 +15,8 @@ sv = Service('nga-clan-battle-spider', bundle='pcr订阅', help_='''
 禁用nga会战爬虫 | 关闭nga会战爬虫服务
 '''.strip())
 
+FILE_FOLDER_PATH=os.path.dirname(__file__)
+
 URL_CN = 'https://bbs.nga.cn/thread.php?stid=20775069'
 URL_JP = 'https://ngabbs.com/thread.php?stid=20774924'
 URL_TW = 'https://ngabbs.com/thread.php?fid=739'
@@ -78,7 +80,7 @@ class NGASpider(BaseSpider):
 
 def load_file(filename, default_obj = {}):
     try:
-        file_path = f'./hoshino/modules/ngaclanbattlespider/{filename}'
+        file_path = os.path.join(FILE_FOLDER_PATH,filename)
         if os.path.exists(file_path):
             with open(file_path, 'r', encoding='utf8') as file:
                 return json.load(file)
@@ -90,7 +92,7 @@ def load_file(filename, default_obj = {}):
 
 def save_file(obj, filename):
     try:
-        with open(f'./hoshino/modules/ngaclanbattlespider/{filename}', 'w', encoding='utf8') as file:
+        with open(os.path.join(FILE_FOLDER_PATH,filename), 'w', encoding='utf8') as file:
             json.dump(obj, file, ensure_ascii=False, indent=4)
         return True
     except:

@@ -6,7 +6,7 @@ import re
 import aiohttp
 
 from hoshino import Service, util, priv
-from hoshino.modules.pcrsealkiller import Config
+from . import Config
 from hoshino.typing import CQEvent, MessageSegment
 
 sv = Service('pcr-seal-killer', bundle='pcr娱乐', help_='''
@@ -16,9 +16,11 @@ sv = Service('pcr-seal-killer', bundle='pcr娱乐', help_='''
 '''.strip())
 
 GACHA_KEYWORDS = ['所持角色交换Pt', '持有的角色交換Pt', '所持キャラ交換Pt', '持有的角色交换Pt', '所持キャラ交换Pt', '所持CSPキャラ交換Pt']
-FILE_FOLDER_PATH = './hoshino/modules/pcrsealkiller/'
-CONFIG_PATH =  f'{FILE_FOLDER_PATH}config.json'
-PIC_PATH = f'{FILE_FOLDER_PATH}sealkiller.jpg'
+RUN_PATH = os.getcwd()
+FILE_FOLDER_PATH = os.path.dirname(__file__)
+RELATIVE_PATH = os.path.relpath(FILE_FOLDER_PATH, RUN_PATH)
+CONFIG_PATH = os.path.join(FILE_FOLDER_PATH,'config.json')
+PIC_PATH = os.path.join(FILE_FOLDER_PATH,'sealkiller.jpg')
 DEFAULT_GACHA_THRESHOLD = 100   # 海豹判定阈值, 如果抽卡次数小于这个阈值，则被判定为海豹
 STRICT_MODE = True              # 开启严格模式后，如果未发现"NEW"而抽卡次数小于阈值，仍会撤回消息，但是不禁言（宁可错杀也不可放过海豹）
 USE_OPENCV = True               # 是否使用Opencv提高识别精确度
@@ -27,7 +29,7 @@ USE_OPENCV = True               # 是否使用Opencv提高识别精确度
 gacha_threshold = Config(CONFIG_PATH)
 ocred_images = {}
 if USE_OPENCV:
-    opencv_util = importlib.import_module('hoshino.modules.pcrsealkiller._opencv_util')
+    opencv_util = importlib.import_module(RELATIVE_PATH.replace(os.sep,'.') + '._opencv_util')
 
 
 async def is_image_gif_or_meme(bot, img):   # 原有基础上添加表情包过滤功能，感谢HoshinoBot群友们的创意
