@@ -222,8 +222,8 @@ def get_card_name_with_rarity(card_name):
         chara_suffix = card_name[0:2]
         chara_nickname = card_name[2:]
     else:
-        chara_suffix = ''
-        chara_nickname = card_name
+        chara_suffix = '普通'
+        chara_nickname = card_name[2:] if card_name.startswith('普通') else card_name
     chara_name = chara.fromname(chara_nickname).name
     return f'{chara_suffix}「{chara_name}」'
 
