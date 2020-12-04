@@ -28,8 +28,11 @@ COL_NUM = 17                    # 查看仓库时每行显示的卡片个数
 OMIT_THRESHOLD = 20             # 当获得卡片数超过这个阈值时，不再显示获得卡片的具体名称，只显示获得的各个稀有度的卡片数目
 BLACKLIST_CARD = []             # 填写不希望被加载的卡片文件名，以逗号分隔。如['icon_unit_100161.png'], 表示不加载六星猫拳的头像
 # 献祭卡片时的获得不同稀有度卡片的概率，-1,0,1表示被献祭卡片的三种稀有度，后面长度为3的列表表示献祭获得卡片三种不同稀有度的概率，要求加和为1
-MIX_PROBABILITY = {str(list((-1,-1))):[0.835,0.16,0.005], str(list((-1,0))):[0.47,0.5,0.03], str(list((-1,1))):[0.55,0.35,0.1],
-                   str(list((0,0))):[0.17,0.75,0.08],       str(list((0,1))):[0.1,0.7,0.2],      str(list((1,1))):[0.15,0.25,0.6]}
+MIX_PROBABILITY = {str(list((-1,-1))):[0.8,0.194,0.006], str(list((-1,0))):[0.44,0.5,0.06], str(list((-1,1))):[0.55,0.3,0.1],
+                   str(list((0,0))):[0.1,0.8,0.1],       str(list((0,1))):[0.3,0.5,0.2],      str(list((1,1))):[0.15,0.25,0.6]}
+# 一键合成概率
+OK_MIX_PROBABILITY = {str(list((-1,-1))):[0.901,0.097,0.002], str(list((-1,0))):[0.73,0.25,0.02], str(list((-1,1))):[0.82,0.15,0.03],
+                   str(list((0,0))):[0.57,0.4,0.03],       str(list((0,1))):[0.69,0.25,0.06],      str(list((1,1))):[0.675,0.125,0.2]}
 
 PRELOAD=True                    # 是否启动时直接将所有图片加载到内存中以提高查看仓库的速度(增加约几M内存消耗)
 
@@ -37,7 +40,7 @@ sv = Service('poke-man-pcr', bundle='pcr娱乐', help_='''
 戳一戳机器人, 她可能会送你公主连结卡片哦~
 查看仓库 [@某人](这是可选参数): 查看某人的卡片仓库和收集度排名，不加参数默认查看自己的仓库
 合成 [卡片1昵称] [卡片2昵称]: 献祭两张卡片以获得一张新的卡片
-一键合成 [稀有度1] [稀有度2] [合成轮数](这是可选参数,不填则合成尽可能多的轮数): 一键进行若干轮"稀有度1"和"稀有度2"的卡片合成
+一键合成 [稀有度1] [稀有度2] [合成轮数](这是可选参数,不填则合成尽可能多的轮数): 一键进行若干轮"稀有度1"和"稀有度2"的卡片合成，使用一键合成时，稀有卡片获得概率为普通合成的1/2，超稀有卡片获得概率为普通合成的1/3
 赠送 [@某人] [赠送的卡片名]: 将自己的卡片赠予别人
 交换 [卡片1昵称] [@某人] [卡片2昵称]: 向某人发起卡片交换请求，用自己的卡片1交换他的卡片2
 确认交换: 收到换卡请求后一定时间内输入这个指令可完成换卡
@@ -390,7 +393,7 @@ async def mix_card(bot, ev: CQEvent):
     await bot.send(ev, f'将两张卡片进行了融合……然后{card}获得了{rarity_desc}「{chara_name}」×1~', at_sender=True)
 
 
-@sv.on_prefix(('一键献祭','一键合成','一键融合'))
+@sv.on_prefix(('一键献祭','一键合成','一键融合','全部献祭','全部合成','全部融合'))
 async def auto_mix_card(bot, ev: CQEvent):
     # 参数识别
     s = ev.message.extract_plain_text()
@@ -452,7 +455,7 @@ async def auto_mix_card(bot, ev: CQEvent):
                     db.add_card_num(ev.group_id, ev.user_id, card_id, -(2*mix_rounds - mixed_cards_amount))
                     break
     # 获得自动合成的卡
-    [normal_prob, rare_prob, super_rare_prob] = MIX_PROBABILITY[str(sorted(list((rarity1, rarity2))))]
+    [normal_prob, rare_prob, super_rare_prob] = OK_MIX_PROBABILITY[str(sorted(list((rarity1, rarity2))))]
     col_num = math.ceil(math.sqrt(mix_rounds))
     row_num = math.ceil(mix_rounds / col_num)
     card_counter, card_descs, card = get_random_cards(db.get_cards_num(ev.group_id, ev.user_id), row_num, col_num, mix_rounds, False, get_random_cards_list, super_rare_prob, rare_prob)
