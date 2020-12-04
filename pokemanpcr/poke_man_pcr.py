@@ -441,11 +441,11 @@ async def auto_mix_card(bot, ev: CQEvent):
             if int(args[2]) > available_card_amount2:
                 await bot.finish(ev, f'合成失败, 多余的【{args[1]}】卡数量不足{args[2]}, 无法一键合成{args[2]}次.')
         if len(args) == 2:
-            if available_cards1 < 1:
+            if available_card_amount1 < 1:
                 await bot.finish(ev, f'合成失败, 多余的【{args[0]}】卡数量不足1, 无法一键合成')
-            if available_cards2 < 1:
+            if available_card_amount2 < 1:
                 await bot.finish(ev, f'合成失败, 多余的【{args[1]}】卡数量不足1, 无法一键合成')
-        mix_rounds = int(args[2]) if len(args) == 3 else math.min(available_cards1, available_cards2)
+        mix_rounds = int(args[2]) if len(args) == 3 else min(available_card_amount1, available_card_amount2)
         for available_cards in [available_cards1, available_cards2]:
             mixed_cards_amount = 0
             for card_id in available_cards:
