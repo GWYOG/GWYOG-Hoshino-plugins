@@ -69,7 +69,8 @@ for image in image_list:
     # 图像缓存
     if PRELOAD:
         image_path = os.path.join(DIR_PATH, image)
-        image_cache[image] = Image.open(image_path)
+        img = Image.open(image_path)
+        image_cache[image] = img.convert('RGBA') if img.mode != 'RGBA' else img
     chara_id = int(image[10:14])
     if chara_id == 1000 or chara_id not in _pcr_data.CHARA_NAME:
         continue
@@ -206,6 +207,7 @@ def get_random_cards(origin_cards, row_num, col_num, amount, bonus, get_random_c
             img = image_cache[random_card]
         else:
             img = Image.open(DIR_PATH + f'/{random_card}')
+            img = img.convert('RGBA') if img.mode != 'RGBA' else img
         row_index = i // col_num
         col_index = i % col_num
         img = img.resize((size, size), Image.ANTIALIAS)
