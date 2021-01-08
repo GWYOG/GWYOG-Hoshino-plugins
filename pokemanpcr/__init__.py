@@ -70,13 +70,6 @@ class CardRecordDAO:
             return -1
         user_card_num = cards_num[uid]
         return sum(n > user_card_num for n in cards_num.values()) + 1
-    
-    def get_group_rank(self,gid):
-        with self.connect() as conn:
-            r = conn.execute(
-                "SELECT uid, count(uid) FROM card_record WHERE gid=? GROUP by uid ORDER BY COUNT(*) DESC", (gid,)
-            ).fetchall()
-        return r
 
     def exist_check(self,key):
         try:
