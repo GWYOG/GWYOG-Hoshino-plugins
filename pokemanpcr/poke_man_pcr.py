@@ -50,9 +50,9 @@ sv = Service('poke-man-pcr', bundle='pcr娱乐', help_='''
 确认交换: 收到换卡请求后一定时间内输入这个指令可完成换卡
 '''.strip())
 poke_tip_cd_limiter = FreqLimiter(TIP_CD_LIMIT)
-daily_tip_limiter = DailyAmountLimiter(POKE_TIP_LIMIT, RESET_HOUR)
-daily_limiter = DailyAmountLimiter(POKE_DAILY_LIMIT, RESET_HOUR)
-daily_give_limiter = DailyAmountLimiter(GIVE_DAILY_LIMIT, RESET_HOUR)
+daily_tip_limiter = DailyAmountLimiter("tip",POKE_TIP_LIMIT, RESET_HOUR)
+daily_limiter = DailyAmountLimiter("poke",POKE_DAILY_LIMIT, RESET_HOUR)
+daily_give_limiter = DailyAmountLimiter("give",GIVE_DAILY_LIMIT, RESET_HOUR)
 cooling_time_limiter = FreqLimiter(POKE_COOLING_TIME)
 exchange_request_master = ExchangeRequestMaster(REQUEST_VALID_TIME)
 db = CardRecordDAO(DB_PATH)
