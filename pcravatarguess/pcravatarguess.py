@@ -1,4 +1,6 @@
 from nonebot import MessageSegment
+from aiocqhttp.message import escape
+
 
 from hoshino import Service, util
 from hoshino.typing import CQEvent
@@ -118,7 +120,7 @@ async def description_guess_group_ranking(bot, ev: CQEvent):
         msg = '猜头像小游戏此群排行为:\n'
         for i in range(min(len(group_ranking), 10)):
             if group_ranking[i][1] != 0:
-                msg += f'第{i+1}名: {group_ranking[i][0]}, 猜对次数: {group_ranking[i][1]}次\n'
+                msg += f'第{i+1}名: {escape(group_ranking[i][0])}, 猜对次数: {group_ranking[i][1]}次\n'
         await bot.send(ev, msg.strip())
     except Exception as e:
         await bot.send(ev, '错误:\n' + str(e))
@@ -169,7 +171,7 @@ async def on_input_chara_name(bot, ev: CQEvent):
                 winning_count = winning_counter._get_winning_number(ev.group_id, ev.user_id)
                 user_card_dict = await get_user_card_dict(bot, ev.group_id)
                 user_card = uid2card(ev.user_id, user_card_dict)
-                msg_part = f'{user_card}猜对了，真厉害！TA已经猜对{winning_count}次了~\n(此轮游戏将在时间到后自动结束，请耐心等待)'
+                msg_part = f'{escape(user_card)}猜对了，真厉害！TA已经猜对{winning_count}次了~\n(此轮游戏将在时间到后自动结束，请耐心等待)'
                 c = chara.fromid(winner_judger.get_correct_chara_id(ev.group_id))
                 msg =  f'正确答案是: {c.name}{c.icon.cqcode}\n{msg_part}'
                 await bot.send(ev, msg)

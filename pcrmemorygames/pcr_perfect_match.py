@@ -2,6 +2,7 @@ import asyncio
 import os
 import random
 
+from aiocqhttp.message import escape
 from hoshino import Service, util
 from hoshino.typing import MessageSegment, CQEvent
 from . import game_util, GameMaster
@@ -35,7 +36,7 @@ async def perfect_match_group_ranking(bot, ev: CQEvent):
         uid, score = item
         m = await bot.get_group_member_info(self_id=ev.self_id, group_id=ev.group_id, user_id=uid)
         name = m["card"] or m["nickname"] or str(uid)
-        msg.append(f"第{i + 1}名: {name}, 总分: {score}分")
+        msg.append(f"第{i + 1}名: {escape(name)}, 总分: {score}分")
     await bot.send(ev, "\n".join(msg))
 
 

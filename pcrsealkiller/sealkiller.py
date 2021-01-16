@@ -59,6 +59,11 @@ def get_gacha_amount(ocr_result):
         gacha_amount = gacha_amount[math.floor(len(gacha_amount)/2):]
     return int(gacha_amount) if gacha_amount.isdigit() else 0
 
+async def judge_bot_auth(bot, ev):
+    bot_info = await bot.get_group_member_info(ev.group_id, ev.self_id, True, ev.self_id)
+    if not bot_info['role'] == 'member':
+        return True
+    return False
 
 async def download(url, path):
     timeout = aiohttp.ClientTimeout(total=60)
@@ -192,11 +197,14 @@ async def on_input_image(bot, ev: CQEvent):
             if need_ocr:
                 need_delete_msg, need_silence = await check_image(bot, ev, img)
                 if need_delete_msg:
+                    bot_auth = judge_bot_auth(bot, ev)
                     if need_silence:
                         await bot.send(ev, '检测到海豹行为(╯‵□′)╯︵┻━┻')
-                        await bot.delete_msg(self_id=ev.self_id, message_id=ev.message_id)
-                        await util.silence(ev, 10*60, skip_su=False)
-                        await bot.send(ev, 'sealkiller插件提醒您:' + str(MessageSegment.image(f'file:///{os.path.abspath(PIC_PATH)}')) + '拒绝海豹，从我做起')
+                        if bot_auth == True:
+                            await bot.delete_msg(self_id=ev.self_id, message_id=ev.message_id)
+                            await util.silence(ev, 10*60, skip_su=True)
+                        await bot.send(ev, str(MessageSegment.image(f'file:///{os.path.abspath(PIC_PATH)}')) + '\n拒绝海豹，从我做起！')
                     else:
-                        await bot.delete_msg(self_id=ev.self_id, message_id=ev.message_id)
-                        await bot.send(ev, '虽然没看出你有没有在晒卡，总之消息先撤回了~')
+                        if bot_auth == True:
+                            await bot.delete_msg(self_id=ev.self_id, message_id=ev.message_id)
+                            await bot.send(ev, '虽然没看出你有没有在晒卡，总之消息先撤回了~')
