@@ -60,7 +60,7 @@ def get_gacha_amount(ocr_result):
     return int(gacha_amount) if gacha_amount.isdigit() else 0
 
 async def judge_bot_auth(bot, ev):
-    bot_info = await bot.get_group_member_info(ev.group_id, ev.self_id, True, ev.self_id)
+    bot_info = await bot.get_group_member_info(group_id=ev.group_id, user_id=ev.self_id)
     if not bot_info['role'] == 'member':
         return True
     return False
@@ -197,7 +197,7 @@ async def on_input_image(bot, ev: CQEvent):
             if need_ocr:
                 need_delete_msg, need_silence = await check_image(bot, ev, img)
                 if need_delete_msg:
-                    bot_auth = judge_bot_auth(bot, ev)
+                    bot_auth = await judge_bot_auth(bot, ev)
                     if need_silence:
                         await bot.send(ev, '检测到海豹行为(╯‵□′)╯︵┻━┻')
                         if bot_auth == True:
