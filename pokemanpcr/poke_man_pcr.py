@@ -359,6 +359,7 @@ async def poke_back(session: NoticeSession):
                               })
         await session.send(poke)
     else:
+        daily_limiter.increase(guid)
         amount = roll_cards_amount()
         col_num = math.ceil(amount / 2)
         row_num = 2 if amount != 1 else 1
@@ -370,7 +371,6 @@ async def poke_back(session: NoticeSession):
         for card_id in card_counter.keys():
             db.add_card_num(
                 session.ctx['group_id'], session.ctx['user_id'], card_id, card_counter[card_id])
-        daily_limiter.increase(guid)
 
 
 @sv.on_prefix(('献祭', '合成', '融合'))
