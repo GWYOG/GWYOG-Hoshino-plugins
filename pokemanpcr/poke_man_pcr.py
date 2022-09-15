@@ -18,9 +18,9 @@ DIR_PATH = os.path.join(os.path.expanduser(
     hoshino.config.RES_DIR), 'img', 'priconne', 'unit')
 DB_PATH = os.path.expanduser("~/.hoshino/poke_man_pcr.db")
 POKE_GET_CARDS = 0.75           # 每一戳的卡片掉落几率
-POKE_DAILY_LIMIT = 3            # 机器人每天掉落卡片的次数
-RARE_PROBABILITY = 0.17         # 戳一戳获得稀有卡片的概率
-SUPER_RARE_PROBABILITY = 0.03   # 戳一戳获得超稀有卡片的概率
+POKE_DAILY_LIMIT = 6            # 机器人每天掉落卡片的次数
+RARE_PROBABILITY = 0.26         # 戳一戳获得稀有卡片的概率
+SUPER_RARE_PROBABILITY = 0.1   # 戳一戳获得超稀有卡片的概率
 REQUEST_VALID_TIME = 60         # 换卡请求的等待时间
 POKE_TIP_LIMIT = 1              # 到达每日掉落上限后的短时最多提示次数
 TIP_CD_LIMIT = 10*60            # 每日掉落上限提示冷却时间
